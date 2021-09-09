@@ -946,7 +946,7 @@ class App extends React.Component<any, any> {
       this.setState({ pendingRequest: true });
 
       // send message
-      const result = await web3.eth.sign(hash, address);
+      const result = await web3.eth.personal.sign(message, address);
 
       // verify signature
       const signer = recoverPublicKey(result, hash);
