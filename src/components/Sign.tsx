@@ -11,13 +11,13 @@ import Typography from "@material-ui/core/Typography";
 import {CardHeader} from "@material-ui/core";
 
 const Sign = (props: any) => {
-    const {address, chainId, queryParams, action} = props;
+    const {address, chainId, queryParams, action, signature} = props;
 
     window.history.replaceState(null, "Navcoin Bridge", "/")
 
     let message = `Hi!
 
-This message will be signed to verify the ownership of your address ${address} in the network ${chainId}.
+This message will be signed to verify the ownership of your address.
 
 Your user identifier is ${queryParams.uid}.
 
@@ -34,24 +34,46 @@ Your Navcoin Bridge Team.`;
         }>
             <CardHeader title={"Sign message "} subheader={"Authenticate your address"}/>
             <CardContent>
-                <Typography variant={"subtitle1"} sx={{
-                    paddingTop: '20px',
-                    paddingBottom: '40px',
-                    wordBreak: 'break-all'
-                }}>
-                    The following message will be signed by<br/><b>{address}</b>:
-                </Typography>
+                { signature ? (
+                    <>
+                        <Typography variant={"subtitle1"} sx={{
+                            paddingTop: '20px',
+                            paddingBottom: '40px',
+                            wordBreak: 'break-all'
+                        }}>
+                            Use the following signature to validate your address:
+                        </Typography>
+
+                        <Typography variant={"caption"} sx={{
+                            paddingTop: '20px',
+                            paddingBottom: '40px',
+                            wordBreak: 'break-all'
+                        }}>
+                            { signature }
+                        </Typography>
+                    </>
+                ) : (
+                    <>
+                        <Typography variant={"subtitle1"} sx={{
+                            paddingTop: '20px',
+                            paddingBottom: '40px',
+                            wordBreak: 'break-all'
+                        }}>
+                            The following message will be signed by<br/><b>{address}</b>:
+                        </Typography>
 
 
-                    {message.split('\n').map ((line) =>
-                        (<Typography variant={"overline"} sx={{display: 'block'}}>
-                            {line}
-                        </Typography>)
-                    )}
+                        {message.split('\n').map ((line) =>
+                            (<Typography variant={"overline"} sx={{display: 'block'}}>
+                                {line}
+                            </Typography>)
+                        )}
 
-                <Button variant={"contained"} sx={{mt: '40px'}} onClick={() => {
-                    action(message, queryParams.redirect)
-                }}>Sign</Button>
+                        <Button variant={"contained"} sx={{mt: '40px'}} onClick={() => {
+                            action(message, queryParams.redirect)
+                        }}>Sign</Button>
+                    </>
+                )}
             </CardContent>
         </Card>
     )
