@@ -455,7 +455,7 @@ class App extends React.Component<any, any> {
       add_wnav_already_asked
     });
 
-    if (validChainif && location.pathname != '/sign')
+    if (validChain && location.pathname != '/sign')
     {
       await this.subscribeTokens();
       await this.getAccountAssets();
