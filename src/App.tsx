@@ -430,14 +430,14 @@ class App extends React.Component<any, any> {
     const validChain = isValidChain(chainId)
 
     const bridgeData : IBridgeData = getBridgeData(chainId);
-    bridgeData.blockNumber = (await this.electrumClient.blockchain_headers_subscribe()).height;
+    if (location.pathname != '/sign')
+      bridgeData.blockNumber = (await this.electrumClient.blockchain_headers_subscribe()).height;
 
     let is_registered = validChain ? await callIsRegistered(address, chainId, web3) : false
 
     let added_assets: any = (await localforage.getItem('addedAssets'));
 
     let add_wnav_already_asked: any = (await localforage.getItem('alreadyAskedToAdd'));
-
 
     let added_asset = added_assets && added_assets[chainId] && added_assets[chainId][address];
 
@@ -455,7 +455,7 @@ class App extends React.Component<any, any> {
       add_wnav_already_asked
     });
 
-    if (validChain)
+    if (validChainif && location.pathname != '/sign')
     {
       await this.subscribeTokens();
       await this.getAccountAssets();
