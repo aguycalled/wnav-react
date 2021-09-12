@@ -62,13 +62,6 @@ Your Navcoin Bridge Team.`;
                             The following message will be signed by<br/><b>{address}</b>:
                         </Typography>
 
-
-                        {message.split('\n').map ((line) =>
-                            (<Typography variant={"overline"} sx={{display: 'block'}}>
-                                {line}
-                            </Typography>)
-                        )}
-
                         <Button variant={"contained"} sx={{mt: '40px'}} onClick={() => {
                             action(message, queryParams.redirect)
                         }}>Sign</Button>
@@ -77,6 +70,12 @@ Your Navcoin Bridge Team.`;
             </CardContent>
         </Card>
     )
+
+    /*                        {message.split('\n').map ((line) =>
+(<Typography variant={"overline"} sx={{display: 'block'}}>
+    {line}
+</Typography>)
+)}*/
 }
 
 export default Sign;

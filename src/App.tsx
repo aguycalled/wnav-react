@@ -34,6 +34,7 @@ import {
   callRouterAllowance, callApproveRouterDeposit, callRouterAllowanceNative,
   callApproveRouterDepositNative
 } from "./helpers/web3";
+
 import {
   TOKEN_NAME,
   TOKEN_FULL_NAME,
@@ -409,7 +410,10 @@ class App extends React.Component<any, any> {
 
     const provider = await this.web3Modal.connect();
 
-    await this.electrumClient.connect();
+    let {location} = this.state;
+
+    if (location.pathname != '/sign')
+      await this.electrumClient.connect();
 
     await this.subscribeProvider(provider);
 
