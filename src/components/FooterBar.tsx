@@ -39,9 +39,6 @@ const SActiveChain = styled(SActiveAccount)`
     margin: 0;
     padding: 0;
   }
-  & p:nth-child(2) {
-    font-weight: bold;
-  }
 `;
 
 interface IHeaderStyle {
@@ -79,10 +76,11 @@ interface IHeaderProps {
     connected: boolean;
     address: string;
     chainId: number;
+    scAddress: string;
 }
 
 const FooterBar = (props: IHeaderProps) => {
-    const { connected, address, chainId, killSession } = props;
+    const { connected, address, chainId, killSession, scAddress } = props;
     const chainData = chainId && isValidChain(chainId) ? getChainData(chainId) : null;
 
     return (
@@ -91,8 +89,8 @@ const FooterBar = (props: IHeaderProps) => {
                 <SHeader {...props}>
                     {connected && chainData ? (
                         <SActiveChain>
-                            <p>{`Connected to`}</p>
-                            <p>{chainData.name}</p>
+                            <p>{`Connected to`} <b>{chainData.name}</b></p>
+                            <p>{`SC: `} {scAddress}</p>
                         </SActiveChain>
                     ) : ''}
 

@@ -184,7 +184,8 @@ export default function PersistentDrawerLeft(props: any) {
                 <FooterBar killSession={props.killSession}
                                connected={props.connected}
                                address={props.address}
-                               chainId={props.chainId}/>
+                               chainId={props.chainId}
+                               scAddress={props.scAddress}/>
             </Footer>
 
         </>

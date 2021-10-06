@@ -1271,7 +1271,8 @@ class App extends React.Component<any, any> {
               chainId={chainId}
               killSession={this.resetApp}
               sectionSelected={this.menuSelected}
-              addedAsset={added_asset}>
+              addedAsset={added_asset}
+              scAddress={TOKEN_CONTRACT[chainId].address}>
             {web3 ? (
                 <DialogAmount open={dialog_amount.open}
                               text={dialog_amount.text}
