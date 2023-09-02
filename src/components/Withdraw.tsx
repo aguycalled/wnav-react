@@ -2,22 +2,22 @@ import * as React from "react";
 import styled from '@emotion/styled'
 import QRCode from "react-qr-code";
 import ActionButton from './ActionButton'
-import Box from "@material-ui/core/Box"
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader'
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
+import Box from "@mui/material/Box"
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader'
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 import {themeOptions} from "../App";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import {AccessAlarm} from "@material-ui/icons";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { createStyles, makeStyles, Theme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import {AccessAlarm} from "@mui/icons-material";
 import {TOKEN_NAME, WITHDRAWAL_FEE} from "../constants";
-
+import moment from "moment";
 
 const Deposit = (props: any) => {
-    const {onWithdraw, validateAddress, balance} = props;
+    const {onWithdraw, validateAddress, balance, averageTime} = props;
 
     const [address, setAddress] = React.useState("")
     const [amount, setAmount] = React.useState(0)
@@ -26,11 +26,11 @@ const Deposit = (props: any) => {
     
     return (
         <Card variant="outlined" sx={{
-            margin: '10px', padding: '20px', width: '90%', maxWidth: '600px', minHeight: '500px'
+            margin: '10px', padding: '20px', width: '90%', maxWidth: '600px', minHeight: '650px', marginBottom: '50px'
         }
         }>
             <CardHeader title={"Withdraw"}
-                        subheader={"Swap your wNAV back to NAV"}/>
+                        subheader={"Swap your wNAV back to NAV or xNAV"}/>
             <CardContent>
                 <TextField
                     id="standard-full-width"
@@ -62,7 +62,7 @@ const Deposit = (props: any) => {
                     error={errorAmount}
                     style={{ marginTop: 20 }}
                     placeholder="100"
-                    helperText={"The amount you want to send. A fee of "+WITHDRAWAL_FEE+" "+ TOKEN_NAME +" will be deducted from the amount. Available: " +balance/1e8 +" " +TOKEN_NAME}
+                    helperText={"The amount you want to send. A fee of "+WITHDRAWAL_FEE+" "+ TOKEN_NAME +" will be deducted from the amount. Available: " +balance/1e8 +" " +TOKEN_NAME + "."}
                     fullWidth
                     margin="normal"
                     InputLabelProps={{
@@ -82,6 +82,14 @@ const Deposit = (props: any) => {
 
                     }}
                 />
+                { averageTime > 0 && <Box sx={{
+                    display:'flex',
+                    marginTop: '40px',
+                    justifyContent: 'center',
+                    width: '100%',
+                }}>
+                    The average withdrawal waiting time is {moment.duration(averageTime*1000).humanize()}
+                </Box>}
                 <Box sx={{
                     display:'flex',
                     marginTop: '40px',
@@ -93,7 +101,7 @@ const Deposit = (props: any) => {
                         <ActionButton onClick={() => {
                             if (!errorAmount && !errorAddress)
                             {
-                                onWithdraw(address, amount*1e8)
+                                onWithdraw(address, Math.floor(amount*1e8))
                             }
                         }}>Withdraw</ActionButton>
                     </Box>

@@ -2,6 +2,7 @@ import { TOKEN_CONTRACT, FARM_CONTRACT, LP_CONTRACT, NATIVE_CONTRACT, ROUTER_CON
 import {getNativeCurrency} from "../components/AccountAssets";
 
 export function isValidChain(chainId: number) {
+    if (chainId == 1) return false;
     return !!(TOKEN_CONTRACT[chainId]);
 }
 
@@ -295,7 +296,7 @@ export function callBurn(address:string, dest:string, amount:number, chainId: nu
             .burnWithNote(amount, dest)
             .send(
                 { from: address,
-                    type: chainId == 1 ? "0x2" : "0x1" }
+                  type: chainId == 1 ? "0x2" : "0x1" }
             ).on("receipt", (txHash: string) => resolve(txHash))
             .catch((err: any) => reject(err));
     })

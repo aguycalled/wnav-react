@@ -3,7 +3,7 @@ export * from './contracts'
 export * from './functions'
 export const TOKEN_NAME = 'WNAV'
 export const TOKEN_FULL_NAME = 'Navcoin'
-export const ELECTRUM_CONFIG = {host: 'electrum4.nav.community', port: 40004, proto: 'wss'}
+export const ELECTRUM_CONFIG = {host: 'electrum3.nav.community', port: 40004, proto: 'wss'}
 export const GAS_SIZE = 107552;
 export const WITHDRAWAL_FEE = 0.004;
 export const BRIDGE_CONFIG =

@@ -3,19 +3,15 @@ import Web3 from "web3";
 import * as localforage from "localforage";
 
 import Web3Modal from "@aguycalled/web3modal";
-import Box from '@material-ui/core/Box'
-import CircularProgress from '@material-ui/core/CircularProgress';
 
-import {withRouter} from "react-router-dom";
+//import {withRouter} from "react-router-dom";
 
 import AccountAssets, {getNativeCurrency} from "./components/AccountAssets";
 import SupplyAudit from "./components/SupplyAudit";
-import Alert from '@material-ui/core/Alert';
 import Drawer from "./components/Drawer";
-import Button from "@material-ui/core/Button"
 import Modal from './components/Modal';
 import ModalResult from "./components/ModalResult";
-import {Link, CardMedia, Typography} from "@material-ui/core";
+import {Alert, Button, Link, CardMedia, Typography, Box, CircularProgress, Grid} from "@mui/material";
 
 
 import Deposit from "./components/Deposit";
@@ -47,9 +43,8 @@ import {
 
 import styled from '@emotion/styled';
 
-import { ThemeProvider, createTheme, responsiveFontSizes } from '@material-ui/core/styles';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-import Grid from '@material-ui/core/Grid';
 import {LiquidityPoolCard} from "./components/LiquidityCard";
 import CardContainer from "./components/CardContainer";
 import ConfirmationDialog from "./components/ConfirmationDialog";
@@ -137,8 +132,8 @@ themeOptions.spacing(10);
 themeOptions= responsiveFontSizes(themeOptions);
 
 const ElectrumClient = require("electrum-client-js");
-const Bitcore = require("bitcore-lib")
-const Binance = require('node-binance-api');
+const Bitcore = require("@aguycalled/bitcore-lib")
+//const Binance = require('node-binance-api');
 
 
 const SContent = styled.div`
@@ -248,6 +243,7 @@ interface IAppState {
   supply_bridge: number;
   validChain: boolean;
   bridgeData: IBridgeData;
+  withdrawalStats: any;
   stakingData: IStakingData;
   farmingData: IFarmingData;
   section: number;
@@ -283,6 +279,7 @@ const INITIAL_STATE: IAppState = {
   supply_cold: 0,
   validChain: true,
   bridgeData: {stakingScriptHash: '', coldScriptHash: '', blockNumber: -1},
+  withdrawalStats: -1,
   stakingData: {stakesCount: 0, stakingBalance: 0},
   farmingData: {
     navInLp: 0,
@@ -379,7 +376,7 @@ class App extends React.Component<any, any> {
   public web3Modal: Web3Modal;
   public state: IAppState;
   public electrumClient: any;
-  public binance: any;
+//  public binance: any;
 
   constructor(props: any) {
     super(props);
@@ -394,7 +391,7 @@ class App extends React.Component<any, any> {
       providerOptions: this.getProviderOptions()
     });
 
-    this.binance = new Binance()
+//    this.binance = new Binance()
 
     this.electrumClient = new ElectrumClient(ELECTRUM_CONFIG.host, ELECTRUM_CONFIG.port, ELECTRUM_CONFIG.proto)
   }
@@ -413,7 +410,7 @@ class App extends React.Component<any, any> {
     let {location} = this.state;
 
     if (location.pathname != '/sign')
-      await this.electrumClient.connect();
+      await this.electrumClient.connect('bridge', '1.5');
 
     await this.subscribeProvider(provider);
 
@@ -474,6 +471,7 @@ class App extends React.Component<any, any> {
     let self = this;
 
     token.events.allEvents({}, async function(error: any, event: any){
+if (!event) return;
       if (event.returnValues["from"] == address || event.returnValues["from"] == address) {
         console.log('update token')
         await self.getAccountAssets();
@@ -483,6 +481,7 @@ class App extends React.Component<any, any> {
     let lpToken = getLpContract(chainId, web3)
 
     lpToken.events.allEvents({}, async function(error: any, event: any){
+if (!event) return;
       if (event.returnValues["from"] == address || event.returnValues["from"] == address) {
         console.log('update lp')
         await self.getAccountAssets();
@@ -492,6 +491,7 @@ class App extends React.Component<any, any> {
     let nativeToken = getNativeContract(chainId, web3)
 
     nativeToken.events.allEvents({}, async function(error: any, event: any){
+if (!event) return;
       if (event.returnValues["from"] == address || event.returnValues["from"] == address) {
         console.log('update native')
         await self.getAccountAssets();
@@ -1068,18 +1068,23 @@ class App extends React.Component<any, any> {
 
     await this.setState({fetching_farming: true, validChain: true});
 
+    console.log('Fetching history from electrum server');
+
     let history = await this.electrumClient.blockchain_scripthash_getHistory(bridgeData.stakingScriptHash, bridgeData.blockNumber-500)
+    console.log('Got '+ history.history.length+' entries.')
 
     let stakesCount = 0;
 
-    for (var i in history) {
-      var entry = history[i]
+    for (var i in history.history) {
+      var entry = history.history[i]
 
       if (bridgeData.blockNumber - entry.height < 480) {
         var tx = await this.electrumClient.blockchain_transaction_getMerkle(entry.tx_hash);
         if (tx.pos == 1) stakesCount++;
       }
     }
+
+    console.log('stakesCount', stakesCount);
 
     stakingData.stakesCount = stakesCount
     stakingData.stakingBalance = (await this.electrumClient.blockchain_scripthash_getBalance(bridgeData.stakingScriptHash)).confirmed;
@@ -1151,6 +1156,7 @@ class App extends React.Component<any, any> {
 
     await this.setState({fetching_farming: true, validChain: true});
 
+    console.log('Fetching rewards info')
     let pairContract = new web3.eth.Contract(LP_CONTRACT.abi, LP_CONTRACT[chainId].address);
     let Token0 = (await pairContract.methods.token0().call()).toLowerCase() == TOKEN_CONTRACT[chainId].address.toLowerCase() ? TOKEN_NAME : getNativeCurrency(chainId).symbol;
     let Token1 = (await pairContract.methods.token1().call()).toLowerCase() == TOKEN_CONTRACT[chainId].address.toLowerCase() ? TOKEN_NAME : getNativeCurrency(chainId).symbol;
@@ -1172,12 +1178,13 @@ class App extends React.Component<any, any> {
     farmingData.expectedNavPerYear = stakingData.stakesCount * 1.8 * 6 * 365;
     farmingData.pendingDistribute = stakingData.stakingBalance * farmingData.share / 100;
     farmingData.apy = farmingData.expectedNavPerYear > 0 ? Math.floor(farmingData.expectedNavPerYear * 1000000 / (farmingData.navInLp)) / 10000 : 0
+    console.log(farmingData, stakingData);
 
     await this.setState({fetching_farming: false, farmingData});
   }
 
   public getBridgeSupply = async () => {
-    const {address, chainId, web3, validChain, bridgeData} = this.state;
+    const {address, chainId, web3, validChain, bridgeData, withdrawalStats} = this.state;
     if (validChain) {
       await this.setState({fetching: true, validChain: true});
       try {
@@ -1189,14 +1196,33 @@ class App extends React.Component<any, any> {
         let deposit_address = navAddress.toString()
         let deposit_scripthash =  Buffer.from(Bitcore.crypto.Hash.sha256(Bitcore.Script.buildPublicKeyHashOut(navAddress).toBuffer()).reverse()).toString("hex")
 
-        let ticker = await this.binance.prices();
-        let nav_price = ticker.NAVBTC / ticker[getBaseCurrency(chainId) + "BTC"];
+//        let ticker = await this.binance.prices();
+        let nav_price = 0; //ticker.NAVBTC / ticker[getBaseCurrency(chainId) + "BTC"];
 
         let gasPrice = await web3.eth.getGasPrice() / 1000000000;
         var mintCost = (GAS_SIZE*gasPrice)/100000000;
-        let gas_cost = BRIDGE_CONFIG.feeMint * (nav_price / mintCost);
+        let gas_cost = BRIDGE_CONFIG.feeMint * (0.0001 / mintCost);
 
-        await this.setState({fetching: false, supply_bridge: supply_bridge, supply_cold: supply_cold, deposit_address, deposit_scripthash, nav_price, gas_cost: gas_cost});
+        let newWithdrawalStats = []; let sum = 0;
+        let last10Withdrawals = await fetch('https://api.navcoin.org/address/NKuyBkoGdZZSLyPbJEetheRhMjeznFZszf/history?sort=height:desc,txindex:desc&size=10&page=1&filters=type:sending');
+        if (last10Withdrawals.ok) {
+          let j = await last10Withdrawals.json();
+          for (let tx of j) {
+            let txDetail = await fetch('https://api.navcoin.org/tx/'+tx.txid);
+            if (txDetail.ok) {
+              try {
+                let parsed = JSON.parse((await txDetail.json()).strdzeel);
+                if (!parsed.burn || !parsed.burn.transactionHash) continue;
+                let ethTx = await web3.eth.getBlock((await web3.eth.getTransactionReceipt(parsed.burn.transactionHash)).blockNumber)
+                newWithdrawalStats.push([tx.txid, parsed.burn.transactionHash, ethTx.timestamp-Math.floor(new Date(tx.time).getTime()/1e3)]);
+                sum += Math.floor(new Date(tx.time).getTime()/1e3)-ethTx.timestamp;
+              } catch(e) { console.log(e); }
+            }
+          }
+          sum /= newWithdrawalStats.length;
+        }
+console.log(sum);
+        await this.setState({fetching: false, supply_bridge: supply_bridge, supply_cold: supply_cold, deposit_address, deposit_scripthash, nav_price, gas_cost: gas_cost, withdrawalStats: sum});
       } catch (error) {
         console.error(error); // tslint:disable-line
         await this.setState({fetching: false});
@@ -1257,7 +1283,8 @@ class App extends React.Component<any, any> {
       token_balance,
       native_balance,
       location,
-      signature
+      signature,
+      withdrawalStats
     } = this.state;
 
     let queryParams = queryString.parse(location.search);
@@ -1409,7 +1436,7 @@ class App extends React.Component<any, any> {
                           <Deposit address={deposit_address} gas_cost={gas_cost} is_registered={is_registered}
                                    onRegister={this.onRegister}/>
                       ) : section == 3 ? (
-                          <Withdraw onWithdraw={this.onWithdraw} validateAddress={this.validateAddress} balance={token_balance}/>
+                          <Withdraw onWithdraw={this.onWithdraw} validateAddress={this.validateAddress} balance={token_balance} averageTime={withdrawalStats}/>
                       ): section == 4 ? fetching_farming ? (
                               <CircularProgress />
                           ) : (
@@ -1479,4 +1506,4 @@ class App extends React.Component<any, any> {
   };
 }
 
-export default withRouter(App);
+export default App;

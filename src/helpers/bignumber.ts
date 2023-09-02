@@ -25,7 +25,7 @@ export function isZero(value: string | number): boolean {
   return new BigNumber(`${value}`).isZero()
 }
 
-export function countDecimalPlaces(value: string | number): number {
+export function countDecimalPlaces(value: string | number): number | null {
   return new BigNumber(`${value}`).dp()
 }
 
@@ -177,14 +177,15 @@ export function handleSignificantDecimals(
   }
   let result = new BigNumber(`${value}`).toFixed(decimals)
   result = new BigNumber(`${result}`).toString()
-  return new BigNumber(`${result}`).dp() <= 2
+  // @ts-ignore: Object is possibly 'null'.
+  return new BigNumber(`${result}`)?.dp() <= 2
     ? new BigNumber(`${result}`).toFormat(2)
     : new BigNumber(`${result}`).toFormat()
 }
 
-export function formatFixedDecimals(value: string, decimals: number): string {
+export function formatFixedDecimals(value: string, decimals: number | null): string {
   const _value = convertNumberToString(value)
-  const _decimals = convertStringToNumber(decimals)
+  const _decimals = convertStringToNumber(decimals || 0)
   const result = new BigNumber(
     new BigNumber(_value).toFixed(_decimals)
   ).toString()
@@ -196,8 +197,8 @@ export function formatInputDecimals(
   inputTwo: string
 ): string {
   const _nativeAmountDecimalPlaces = countDecimalPlaces(inputTwo)
-  const decimals =
-    _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8
+  // @ts-ignore: Object is possibly 'null'.
+  const decimals =    _nativeAmountDecimalPlaces > 8 ? _nativeAmountDecimalPlaces : 8
   const result = new BigNumber(formatFixedDecimals(inputOne, decimals))
     .toFormat()
     .replace(/,/g, '')

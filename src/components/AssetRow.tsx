@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from '@emotion/styled';
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Icon from "./Icon";
 import ERC20Icon from "./ERC20Icon";
 import token from "../assets/token.svg";

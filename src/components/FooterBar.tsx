@@ -1,7 +1,7 @@
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Box from '@material-ui/core/Box';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import * as React from "react";
 import styled from "@emotion/styled"
@@ -11,7 +11,7 @@ import { ellipseAddress, getChainData } from "../helpers/utilities";
 import { isValidChain} from "../helpers/web3";
 import { transitions } from "../styles";
 import clsx from "clsx";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@mui/material/styles";
 
 const SHeader = styled.div`
   margin-top: -1px;

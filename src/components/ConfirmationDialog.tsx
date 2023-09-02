@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Dialog, DialogTitle, DialogActions, DialogContent, Button} from "@material-ui/core";
+import {Dialog, DialogTitle, DialogActions, DialogContent, Button} from "@mui/material";
 
 export interface ConfirmationDialogRawProps {
     id: string;

@@ -1,11 +1,11 @@
 import * as React from "react";
-import Box from '@material-ui/core/Box';
-import Card from '@material-ui/core/Card';
-import Button from '@material-ui/core/Button';
-import CardActionArea from '@material-ui/core/CardActionArea'
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
+import CardActionArea from '@mui/material/CardActionArea'
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 import AssetRow from "./AssetRow";
 import {IAssetData, IChainData} from "../helpers/types";
 import {callBalanceOfToken} from "../helpers/web3";

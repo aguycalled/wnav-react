@@ -1,14 +1,14 @@
 import * as React from "react";
 import styled from '@emotion/styled'
 import QRCode from "react-qr-code";
-import Box from "@material-ui/core/Box"
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
+import Box from "@mui/material/Box"
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 import {themeOptions} from "../App";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import {CardHeader} from "@material-ui/core";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import {CardHeader} from "@mui/material";
 
 const Sign = (props: any) => {
     const {address, chainId, queryParams, action, signature} = props;
